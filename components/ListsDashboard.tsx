@@ -22,6 +22,7 @@ export default function ListsDashboard({ userId }: { userId: string }) {
   const [editingListName, setEditingListName] = useState("");
   const [filter, setFilter] = useState<ListFilter>("current");
   const [archivedMonth, setArchivedMonth] = useState("all");
+  const [allMonth, setAllMonth] = useState("all");
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -249,12 +250,19 @@ export default function ListsDashboard({ userId }: { userId: string }) {
         .map((list) => list.month_start)
     )
   ).sort((firstMonth, secondMonth) => secondMonth.localeCompare(firstMonth));
+  const allMonths = Array.from(
+    new Set(
+      lists
+        .filter((list) => !list.is_rollover && !isGeneratedRolloverName(list.name))
+        .map((list) => list.month_start)
+    )
+  ).sort((firstMonth, secondMonth) => secondMonth.localeCompare(firstMonth));
   const visibleLists = lists.filter((list) => {
     if (list.is_rollover || isGeneratedRolloverName(list.name)) return false;
     if (filter === "archived") {
       return list.status === "archived" && (archivedMonth === "all" || list.month_start === archivedMonth);
     }
-    if (filter === "all") return true;
+    if (filter === "all") return allMonth === "all" || list.month_start === allMonth;
     return list.status === "active" && list.month_start === currentMonth;
   });
   const listsByMonth = visibleLists.reduce<Record<string, ShoppingList[]>>((groups, list) => {
@@ -329,6 +337,25 @@ export default function ListsDashboard({ userId }: { userId: string }) {
           >
             <option value="all">Todos os meses</option>
             {archivedMonths.map((month) => (
+              <option key={month} value={month}>
+                {formatMonth(month)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {filter === "all" && (
+        <label className="mt-3 block max-w-xs text-sm font-medium text-neutral-600" htmlFor="all-month">
+          Mês das listas
+          <select
+            id="all-month"
+            value={allMonth}
+            onChange={(event) => setAllMonth(event.target.value)}
+            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-normal focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          >
+            <option value="all">Todos os meses</option>
+            {allMonths.map((month) => (
               <option key={month} value={month}>
                 {formatMonth(month)}
               </option>
