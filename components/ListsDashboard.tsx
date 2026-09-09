@@ -346,13 +346,14 @@ export default function ListsDashboard({ userId }: { userId: string }) {
       )}
 
       {filter === "all" && (
-        <label className="mt-3 block max-w-xs text-sm font-medium text-neutral-600" htmlFor="all-month">
-          Mês das listas
+        <div className="mt-3 rounded-md border border-brand-100 bg-brand-50 p-3">
+          <label className="block max-w-xs text-sm font-medium text-brand-800" htmlFor="all-month">
+          Filtrar Todas por mês
           <select
             id="all-month"
             value={allMonth}
             onChange={(event) => setAllMonth(event.target.value)}
-            className="mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm font-normal focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            className="mt-1 w-full rounded-md border border-brand-200 bg-white px-3 py-2 text-sm font-normal text-neutral-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
           >
             <option value="all">Todos os meses</option>
             {allMonths.map((month) => (
@@ -361,7 +362,8 @@ export default function ListsDashboard({ userId }: { userId: string }) {
               </option>
             ))}
           </select>
-        </label>
+          </label>
+        </div>
       )}
 
       <ul className="mt-6 divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-white">
