@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import ComparisonsDashboard from "@/components/ComparisonsDashboard";
 
 export default async function ComparativosPage() {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -6,9 +6,10 @@ import ListItems from "@/components/ListItems";
 export default async function ListDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const supabase = createServerSupabaseClient();
+  const { id } = await params;
+  const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -20,7 +21,7 @@ export default async function ListDetailPage({
   const { data: list, error } = await supabase
     .from("shopping_lists")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !list) {

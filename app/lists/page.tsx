@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import ListsDashboard from "@/components/ListsDashboard";
 
 export default async function ListsPage() {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
