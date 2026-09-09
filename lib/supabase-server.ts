@@ -3,7 +3,9 @@ import { cookies } from "next/headers";
 import type { Database } from "./types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 /**
  * Cliente Supabase para uso em Server Components, Route Handlers e
