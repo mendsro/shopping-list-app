@@ -195,3 +195,12 @@ create policy "Usuários podem excluir itens de suas listas"
         and sl.user_id = auth.uid()
     )
   );
+
+-- Permissões explícitas para a API REST do Supabase.
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on public.shopping_lists to anon, authenticated;
+grant select, insert, update, delete on public.list_items to anon, authenticated;
+grant select, insert, update, delete on public.monthly_budget_goals to anon, authenticated;
+
+-- Solicita ao PostgREST a atualização do cache de tabelas.
+notify pgrst, 'reload schema';
