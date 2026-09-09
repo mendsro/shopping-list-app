@@ -159,7 +159,8 @@ export default function ListsDashboard({ userId }: { userId: string }) {
       return;
     }
 
-    if (error) removeLocalArchivedList(userId, list.id);
+    removeLocalArchivedList(userId, list.id);
+    saveLocalListMonth(userId, list.id, getCurrentMonthStart());
 
     setLists((current) =>
       current.map((currentList) =>
@@ -256,6 +257,13 @@ export default function ListsDashboard({ userId }: { userId: string }) {
     if (filter === "all") return true;
     return list.status === "active" && list.month_start === currentMonth;
   });
+  const listsByMonth = visibleLists.reduce<Record<string, ShoppingList[]>>((groups, list) => {
+    (groups[list.month_start] ??= []).push(list);
+    return groups;
+  }, {});
+  const visibleMonths = Object.keys(listsByMonth).sort((firstMonth, secondMonth) =>
+    secondMonth.localeCompare(firstMonth)
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
@@ -351,9 +359,26 @@ export default function ListsDashboard({ userId }: { userId: string }) {
           </li>
         )}
 
-        {visibleLists.map((list) => (
-          <li key={list.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-            <div>
+        {filter === "all"
+          ? visibleMonths.map((month) => (
+              <li key={month} className="list-none">
+                <h2 className="border-b border-neutral-200 bg-neutral-50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                  {formatMonth(month)}
+                </h2>
+                <ul className="divide-y divide-neutral-200">
+                  {listsByMonth[month].map((list) => renderList(list))}
+                </ul>
+              </li>
+            ))
+          : visibleLists.map((list) => renderList(list))}
+      </ul>
+    </div>
+  );
+
+  function renderList(list: ShoppingList) {
+    return (
+      <li key={list.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+        <div>
               {editingListId === list.id ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <input
@@ -424,11 +449,9 @@ export default function ListsDashboard({ userId }: { userId: string }) {
                 Excluir
               </button>
             </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+      </li>
+    );
+  }
 }
 
 function isMissingMonthColumns(code?: string) {
@@ -465,7 +488,9 @@ function normalizeLegacyLists(lists: Array<Omit<ShoppingList, "month_start" | "s
 function applyLocalArchivedState(lists: ShoppingList[], userId: string) {
   const archivedIds = readLocalArchivedLists(userId);
   return lists.map((list) =>
-    archivedIds.has(list.id) ? { ...list, status: "archived" as const } : list
+    archivedIds.has(list.id) && list.status !== "active"
+      ? { ...list, status: "archived" as const }
+      : list
   );
 }
 
